@@ -1,0 +1,13 @@
+{
+  "bit": "http",
+  
+  "path": "dist/http.js",
+  
+  "version": "0.1.0",
+  
+  "author": "Nery Jr",
+  
+  "description": "HTTP module (client and server)",
+  
+  "dependencies": []
+}
