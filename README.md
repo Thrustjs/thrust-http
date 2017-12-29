@@ -5,12 +5,12 @@ Modulo http do thrust que inclui servidor http e http client
 
 Crie um arquivo, por exemplo *server.js*, e copie o código abaixo:
 ```javascript
-    var server = require("./http").server
-    var router = require("./httpRouter")
+var server = require("./http").server
+var router = require("./httpRouter")
 
-    print("Hello Server!!")
+print("Hello Server!!")
 
-    server.createServer(3000, router)
+server.createServer(3000, router)
 ```
 
 Vá na console e execute o thrust:
