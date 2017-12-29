@@ -20,7 +20,7 @@ java -jar thrust.jar server.js
 O servidor HTTP irá subir na porta 3000.
 Chame a URL http://localhost:3000/ a partir de um browser e será renderizado o seguinte conteúdo:
 ```html
-    <H2>Thrust is running!!!</H2>
+Thrust is running!!!
 ```
 
 ## Example HTTP Client
