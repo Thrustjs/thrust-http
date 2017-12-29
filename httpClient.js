@@ -1,8 +1,6 @@
-var File = Java.type('java.io.File')
-var Scanner = Java.type('java.util.Scanner')
-var URL = Java.type('java.net.URL')
-var URLConnection = Java.type('java.net.URLConnection')
-var StandardCharsets = Java.type('java.nio.charset.StandardCharsets')
+var Scanner = Java.type("java.util.Scanner")
+var URL = Java.type("java.net.URL")
+var StandardCharsets = Java.type("java.nio.charset.StandardCharsets")
 
 
 function mount_http_request(method, url, params) {
@@ -83,7 +81,7 @@ function mount_http_request(method, url, params) {
 }
 
 
- /**
+/**
   * Busca informações em uma api REST
   * @example
   * // returns {nome: "David", idade: 10}

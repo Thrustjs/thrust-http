@@ -1,3 +1,7 @@
 tomcat.*
 *.jar
 *.java
+.eslintrc
+.eslintrc.json
+teste.js
+server.js
