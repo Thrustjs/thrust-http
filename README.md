@@ -1,7 +1,28 @@
 # thrust-http
 Modulo http do thrust que inclui servidor http e http client
 
-## Example
+## Example HTTP Server
+
+Crie um arquivo, por exemplo *server.js*, e copie o código abaixo:
+
+    var server = require("./http").server
+    var router = require("./httpRouter")
+
+    print("Hello Server!!")
+
+    server.createServer(3000, router)
+
+Vá na console e execute o thrust:
+
+    java -jar thrust.jar server.js
+
+O servidor HTTP irá subir na porta 3000.
+Chame a URL http://localhost:3000/ a partir de um browser e será renderizado o seguinte conteúdo:
+
+    Thrust is running!!!
+    
+
+## Example HTTP Client
 
     print ("\n",
         HTTPClient
