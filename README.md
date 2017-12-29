@@ -20,7 +20,7 @@ O servidor HTTP irá subir na porta 3000.
 Chame a URL http://localhost:3000/ a partir de um browser e será renderizado o seguinte conteúdo:
 
     Thrust is running!!!
-    
+
 
 ## Example HTTP Client
 
