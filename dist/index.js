@@ -35,16 +35,6 @@ var LifecycleException = Java.type("org.apache.catalina.LifecycleException")
  */
 var router
 
-
-function loadJar(filename) {
-    var file = new File(filename)
-    var method = URLClassLoader.class.getDeclaredMethod("addURL", [URL.class])
-
-    method.setAccessible(true)
-    method.invoke(ClassLoader.getSystemClassLoader(), [file.toURI().toURL()])
-}
-
-
 function createServer(port, httpRouter) {
         var tomcat = new Tomcat()
         var ctx = tomcat.addContext("/", new File(".").getAbsolutePath())
