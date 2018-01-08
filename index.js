@@ -13,6 +13,7 @@ var URLDecoder = Java.type("java.net.URLDecoder")
 
 loadJar("./jarlib/tomcat-embed-core-9.0.2.jar")
 
+
 var Tomcat = Java.type("org.apache.catalina.startup.Tomcat")
 var WebResourceRoot = Java.type("org.apache.catalina.WebResourceRoot")
 var StandardContext = Java.type("org.apache.catalina.core.StandardContext")
@@ -29,8 +30,8 @@ var LifecycleException = Java.type("org.apache.catalina.LifecycleException")
 
 
 /**
- * Gerenciador de rotas. Processa as requisições HTTP e segundo definições 
- * do bitcode (módulo) utilizado para o gerenciamento, endereça o código a 
+ * Gerenciador de rotas. Processa as requisições HTTP e segundo definições
+ * do bitcode (módulo) utilizado para o gerenciamento, endereça o código a
  * ser executado. Similar ao framework "Express" no ecosistema NodeJS.
  */
 var router
@@ -55,15 +56,15 @@ function createServer(port, httpRouter) {
             service: function( request,  response) {
                 service(request, response)
             }
-        })        
+        })
         ctx.addServletMappingDecoded("/*", "thrust")
 
 		Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
 		ctx.addServletMappingDecoded("/static/*", "static");
-        
+
 		Tomcat.addServlet(ctx, "favicon", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
-		ctx.addServletMappingDecoded("/favicon.ico", "favicon"); 
-        
+		ctx.addServletMappingDecoded("/favicon.ico", "favicon");
+
         tomcat.setPort(port)
         tomcat.start()
         print("Running on port " + port +  "...")
@@ -172,7 +173,7 @@ function mountRequest(httpRequest) {
 
    /**
     * @function {getParts} - Retorna uma coleção de '*javax.servlet.http.Parts*', que por definição
-    *  *"represents a part as uploaded to the server as part of a multipart/form-data 
+    *  *"represents a part as uploaded to the server as part of a multipart/form-data
     * request body. The part may represent either an uploaded file or form data."*
     * @return {type} {description}
     */
@@ -197,7 +198,7 @@ function mountRequest(httpRequest) {
         method: httpRequest.getMethod().toUpperCase(),
 
         requestURI: httpRequest.getRequestURI(),
-        
+
         pathInfo: httpRequest.getPathInfo(),
 
         scheme: httpRequest.getScheme(),
@@ -243,7 +244,7 @@ function mountResponse(httpResponse) {
         },
 
         /**
-         * Escreve em formato *texto* o conteúdo passado no parâmetro *content* como resposta 
+         * Escreve em formato *texto* o conteúdo passado no parâmetro *content* como resposta
          * a requisição. Modifica o valor do *content-type* para *'text/html'*.
          * @param {Object} data - dado a ser enviado para o cliente.
          * @param {Number} statusCode - (opcional) status de retorno do request htttp.
@@ -278,7 +279,7 @@ function mountResponse(httpResponse) {
         },
 
         /**
-         * Escreve em formato *JSON* o objeto passado no parâmetro *data* como resposta 
+         * Escreve em formato *JSON* o objeto passado no parâmetro *data* como resposta
          * a requisição. Modifica o valor do *content-type* para *'application/json'*.
          * @param {Object} data - dado a ser enviado para o cliente.
          * @param {Number} statusCode - (opcional) status de retorno do request htttp.
@@ -286,17 +287,17 @@ function mountResponse(httpResponse) {
          */
         json: function (data, statusCode, headers) {
             var ths = this
-            
+
             this.contentType = "application/json"
             this.status = statusCode || 200
-    
+
             for (var opt in (headers || {})) {
                 ths.headers[opt] = headers[opt]
             }
-    
+
             this.out[0] = (typeof (data) == "object") ? JSON.stringify(data) : data
         },
-    
+
         /**
          * Objeto que encapsula os métodos de retornos quando ocorre um erro na requisição http.
          * @ignore
@@ -304,8 +305,8 @@ function mountResponse(httpResponse) {
         error: {
             /**
              * Escreve em formato *JSON* uma mensagem de erro como resposta a requisição no
-             * formato {message: *message*, status: *statusCode*}. Modifica o valor 
-             * do *content-type* para *'application/json'*. 
+             * formato {message: *message*, status: *statusCode*}. Modifica o valor
+             * do *content-type* para *'application/json'*.
              * @alias error.json
              * @memberof! http.Response#
              * @instance error.json
@@ -318,11 +319,11 @@ function mountResponse(httpResponse) {
 
                 this.contentType = "application/json"
                 this.status = statusCode || 200
-    
+
                 for (var opt in (headers || {})) {
                     ths.headers[opt] = headers[opt]
                 }
-    
+
                 this.out[0] = JSON.stringify({
                     status: ths.status,
                     message: message
