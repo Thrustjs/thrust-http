@@ -49,7 +49,7 @@ function createServer(port, httpRouter) {
         var tomcat = new Tomcat()
         var ctx = tomcat.addContext("/", new File(".").getAbsolutePath())
 
-        router = (httpRouter) ? httpRouter : require("./httpRouter")
+        router = (httpRouter) ? httpRouter : require("thrust-bitcodes/router")
 
         Tomcat.addServlet(ctx, "thrust", new HttpServlet() {
             service: function( request,  response) {
