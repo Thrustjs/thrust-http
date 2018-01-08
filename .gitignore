@@ -3,5 +3,5 @@ tomcat.*
 *.java
 .eslintrc
 .eslintrc.json
+jsconfig.json
 teste.js
-server.js
