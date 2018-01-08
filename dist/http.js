@@ -338,9 +338,5 @@ function mountResponse(httpResponse) {
 
 
 exports = {
-    test: function name() {
-        print("Server OK!")
-    },
-
     createServer: createServer
 }
