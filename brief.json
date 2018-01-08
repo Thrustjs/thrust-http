@@ -1,13 +1,10 @@
 {
-  "bit": "http",
-  
-  "path": "dist/http.js",
-  
-  "version": "0.1.0",
-  
-  "author": "Nery Jr",
-  
   "description": "HTTP server module",
-  
-  "dependencies": []
+  "name": "http",
+  "path": "dist",
+  "version": "0.1.1",
+  "author": "Nery Jr",
+  "dependencies": [
+    "thrust-bitcodes/router"
+  ]
 }

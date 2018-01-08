@@ -1,5 +1,4 @@
 tomcat.*
-*.jar
 *.java
 .eslintrc
 .eslintrc.json
