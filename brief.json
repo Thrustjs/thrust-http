@@ -7,7 +7,7 @@
   
   "author": "Nery Jr",
   
-  "description": "HTTP module (client and server)",
+  "description": "HTTP server module",
   
   "dependencies": []
 }
