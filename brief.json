@@ -2,7 +2,7 @@
   "description": "HTTP server module",
   "name": "http",
   "path": "dist",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Nery Jr",
   "dependencies": [
     "thrust-bitcodes/router"
