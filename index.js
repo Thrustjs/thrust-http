@@ -10,9 +10,7 @@ var URL = Java.type("java.net.URL")
 var URLConnection = Java.type("java.net.URLConnection")
 var URLDecoder = Java.type("java.net.URLDecoder")
 
-
 loadJar("./jarlib/tomcat-embed-core-9.0.2.jar")
-
 
 var Tomcat = Java.type("org.apache.catalina.startup.Tomcat")
 var WebResourceRoot = Java.type("org.apache.catalina.WebResourceRoot")
@@ -28,7 +26,6 @@ var Context = Java.type("org.apache.catalina.Context")
 var LifecycleException = Java.type("org.apache.catalina.LifecycleException")
 // var Class = Java.type("")
 
-
 /**
  * Gerenciador de rotas. Processa as requisições HTTP e segundo definições
  * do bitcode (módulo) utilizado para o gerenciamento, endereça o código a
@@ -36,306 +33,297 @@ var LifecycleException = Java.type("org.apache.catalina.LifecycleException")
  */
 var router
 
-
-function loadJar(filename) {
-    var file = new File(filename)
-    var method = URLClassLoader.class.getDeclaredMethod("addURL", [URL.class])
-
-    method.setAccessible(true)
-    method.invoke(ClassLoader.getSystemClassLoader(), [file.toURI().toURL()])
-}
-
-
 function createServer(port, httpRouter) {
-        var tomcat = new Tomcat()
-        var ctx = tomcat.addContext("/", new File(".").getAbsolutePath())
+  var tomcat = new Tomcat()
+  var ctx = tomcat.addContext("/", new File(".").getAbsolutePath())
 
-        router = (httpRouter) ? httpRouter : require("./httpRouter")
+  router = (httpRouter) ? httpRouter : require("thrust-bitcodes/router")
 
-        Tomcat.addServlet(ctx, "thrust", new HttpServlet() {
-            service: function( request,  response) {
-                service(request, response)
-            }
-        })
-        ctx.addServletMappingDecoded("/*", "thrust")
+  Tomcat.addServlet(ctx, "thrust", new HttpServlet() {
+    service: function (request, response) {
+      service(request, response)
+    }
+  })
+  ctx.addServletMappingDecoded("/*", "thrust")
 
-		Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
-		ctx.addServletMappingDecoded("/static/*", "static");
+  Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
+  ctx.addServletMappingDecoded("/static/*", "static");
 
-		Tomcat.addServlet(ctx, "favicon", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
-		ctx.addServletMappingDecoded("/favicon.ico", "favicon");
+  Tomcat.addServlet(ctx, "favicon", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
+  ctx.addServletMappingDecoded("/favicon.ico", "favicon");
 
-        tomcat.setPort(port)
-        tomcat.start()
-        print("Running on port " + port +  "...")
-        tomcat.getServer().await()
+  tomcat.setPort(port)
+  tomcat.getConnector();
+  tomcat.start()
+  print("Running on port " + port + "...")
+  tomcat.getServer().await()
 }
 
 
 function service(httpRequest, httpResponse) {
-    var request = mountRequest(httpRequest)
-    var response = mountResponse(httpResponse)
-    var params = parseParams(request.queryString, request.contentType)
-    var writer = httpResponse.getWriter()
+  var request = mountRequest(httpRequest)
+  var response = mountResponse(httpResponse)
+  var params = parseParams(request.queryString, request.contentType)
+  var writer = httpResponse.getWriter()
 
-    router.process(params, request, response)
+  router.process(params, request, response)
 
-/*     httpResponse.setContentType("text/plain")
-    writer.write("Hello, Embedded World from Blue Lotus Software!")
-    httpResponse.setContentType("application/json")
-    httpResponse.setCharacterEncoding("UTF-8")
-    writer.write('{nome: "P Paulo", idade: 13}')
-    writer.flush()
-    writer.close() */
+  /*     httpResponse.setContentType("text/plain")
+      writer.write("Hello, Embedded World from Blue Lotus Software!")
+      httpResponse.setContentType("application/json")
+      httpResponse.setCharacterEncoding("UTF-8")
+      writer.write('{nome: "P Paulo", idade: 13}')
+      writer.flush()
+      writer.close() */
 }
 
 
 function parseParams(strParams, contentType) {
-    var params = {}
+  var params = {}
 
-    function parseValue(value) {
-        var nv = parseFloat(value)
+  function parseValue(value) {
+    var nv = parseFloat(value)
 
-        return isNaN(nv) ? value : nv
+    return isNaN(nv) ? value : nv
+  }
+
+  function parseKey(skey, value) {
+    var patt = /\w+|\[\w*\]/g
+    var k, ko, key = patt.exec(skey)[0]
+    var p = params
+    while ((ko = patt.exec(skey)) != null) {
+      k = ko.toString().replace(/\[|\]/g, '')
+      var m = k.match(/\d+/gi)
+      if ((m != null && m.toString().length == k.length) || ko == '[]') {
+        k = parseInt(k)
+        p[key] = p[key] || []
+      } else {
+        p[key] = p[key] || {}
+      }
+      p = p[key]
+      key = k
     }
+    if (typeof (key) == 'number' && isNaN(key))
+      p.push(parseValue(value))
+    else
+      p[key] = parseValue(value)
+  }
 
-    function parseKey(skey, value) {
-        var patt = /\w+|\[\w*\]/g
-        var k, ko, key = patt.exec(skey)[0]
-        var p = params
-        while ((ko = patt.exec(skey)) != null) {
-            k = ko.toString().replace(/\[|\]/g, '')
-            var m = k.match(/\d+/gi)
-            if ((m != null && m.toString().length == k.length) || ko == '[]') {
-                k = parseInt(k)
-                p[key] = p[key] || []
-            } else {
-                p[key] = p[key] || {}
-            }
-            p = p[key]
-            key = k
-        }
-        if (typeof(key) == 'number' && isNaN(key))
-            p.push(parseValue(value))
-        else
-            p[key] = parseValue(value)
+  function parseParam(sparam) {
+    var vpar = unescape(sparam).split('=')
+    parseKey(vpar[0], vpar[1])
+  }
+
+  if (strParams !== null && strParams !== '') {
+
+    if (contentType && contentType.startsWith('application/json')) {
+      params = JSON.parse(strParams)
+    } else {
+      var arrParams = strParams.split('&')
+
+      for (var i = 0; i < arrParams.length; i++) {
+        parseParam(arrParams[i])
+      }
     }
+  }
 
-    function parseParam(sparam) {
-        var vpar = unescape(sparam).split('=')
-        parseKey(vpar[0], vpar[1])
-    }
-
-    if (strParams !== null && strParams !== '') {
-
-        if (contentType && contentType.startsWith('application/json')) {
-            params = JSON.parse(strParams)
-        } else {
-            var arrParams = strParams.split('&')
-
-            for (var i = 0; i < arrParams.length; i++) {
-                parseParam(arrParams[i])
-            }
-        }
-    }
-
-    return params
+  return params
 }
 
 
 function mountRequest(httpRequest) {
-    var queryString = (function () {
-        var contentType = httpRequest.getContentType() || ""
-        var qs = ""
+  var queryString = (function () {
+    var contentType = httpRequest.getContentType() || ""
+    var qs = ""
 
-        if (contentType.indexOf("multipart/form-data") == -1) {
-            qs = httpRequest.getReader().readLine()
-            qs = (qs === null || qs === "") ? httpRequest.getQueryString() : qs
-            qs = (qs === null) ? "" : URLDecoder.decode(qs, "UTF-8")
-        }
-
-        return qs
-    })()
-
-    var headers = (function() {
-        var headerNames = httpRequest.getHeaderNames()
-        var headersNameValue = {}
-
-        if (headerNames != null) {
-            while (headerNames.hasMoreElements()) {
-                var name = headerNames.nextElement()
-                headersNameValue[name] =  httpRequest.getHeader(name)
-            }
-        }
-
-        return headersNameValue
-    })()
-
-   /**
-    * @function {getParts} - Retorna uma coleção de '*javax.servlet.http.Parts*', que por definição
-    *  *"represents a part as uploaded to the server as part of a multipart/form-data
-    * request body. The part may represent either an uploaded file or form data."*
-    * @return {type} {description}
-    */
-    var parts = (function () {
-        var contentType = httpRequest.getContentType() || ""
-
-        if (contentType.indexOf("multipart/form-data") == -1)
-            return []
-
-       return httpRequest.getParts().toArray()
-    })
-
-    return {
-        httpRequest: httpRequest,
-
-        queryString: queryString,
-
-        rest: httpRequest.getRequestURI().replace(this.contextPath, ""),
-
-        contentType: httpRequest.getContentType() || "",
-
-        method: httpRequest.getMethod().toUpperCase(),
-
-        requestURI: httpRequest.getRequestURI(),
-
-        pathInfo: httpRequest.getPathInfo(),
-
-        scheme: httpRequest.getScheme(),
-
-        host: httpRequest.getServerName(),
-
-        port: httpRequest.getServerPort(),
-
-        headers: headers,
-
-        contextPath: httpRequest.getContextPath(),
-
-        servletPath: httpRequest.getServletPath(),
-
-        parts: parts
+    if (contentType.indexOf("multipart/form-data") == -1) {
+      qs = httpRequest.getReader().readLine()
+      qs = (qs === null || qs === "") ? httpRequest.getQueryString() : qs
+      qs = (qs === null) ? "" : URLDecoder.decode(qs, "UTF-8")
     }
+
+    return qs
+  })()
+
+  var headers = (function () {
+    var headerNames = httpRequest.getHeaderNames()
+    var headersNameValue = {}
+
+    if (headerNames != null) {
+      while (headerNames.hasMoreElements()) {
+        var name = headerNames.nextElement()
+        headersNameValue[name] = httpRequest.getHeader(name)
+      }
+    }
+
+    return headersNameValue
+  })()
+
+  /**
+   * @function {getParts} - Retorna uma coleção de '*javax.servlet.http.Parts*', que por definição
+   *  *"represents a part as uploaded to the server as part of a multipart/form-data
+   * request body. The part may represent either an uploaded file or form data."*
+   * @return {type} {description}
+   */
+  var parts = (function () {
+    var contentType = httpRequest.getContentType() || ""
+
+    if (contentType.indexOf("multipart/form-data") == -1)
+      return []
+
+    return httpRequest.getParts().toArray()
+  })
+
+  return {
+    httpRequest: httpRequest,
+
+    queryString: queryString,
+
+    rest: httpRequest.getRequestURI().replace(this.contextPath, ""),
+
+    contentType: httpRequest.getContentType() || "",
+
+    method: httpRequest.getMethod().toUpperCase(),
+
+    requestURI: httpRequest.getRequestURI(),
+
+    pathInfo: httpRequest.getPathInfo(),
+
+    scheme: httpRequest.getScheme(),
+
+    host: httpRequest.getServerName(),
+
+    port: httpRequest.getServerPort(),
+
+    headers: headers,
+
+    contextPath: httpRequest.getContextPath(),
+
+    servletPath: httpRequest.getServletPath(),
+
+    parts: parts
+  }
 
 }
 
 
 function mountResponse(httpResponse) {
-    var response = {
-        httpResponse: httpResponse,
+  var response = {
+    httpResponse: httpResponse,
 
-        status: 200,
+    status: 200,
 
-        contentLength: 0,
+    contentLength: 0,
 
-        contentType : "text/html",
+    contentType: "text/html",
 
-        charset: "UTF-8",
+    charset: "UTF-8",
 
-        headers: {},
+    headers: {},
 
-        out: [],
+    out: [],
 
-        clean: function () {
-            this.out = []
-            this.headers = {}
-            this.contentLength = 0
-            this.contentType = "text/html"
-            this.charset = "utf-8"
-        },
+    clean: function () {
+      this.out = []
+      this.headers = {}
+      this.contentLength = 0
+      this.contentType = "text/html"
+      this.charset = "utf-8"
+    },
 
-        /**
-         * Escreve em formato *texto* o conteúdo passado no parâmetro *content* como resposta
-         * a requisição. Modifica o valor do *content-type* para *'text/html'*.
-         * @param {Object} data - dado a ser enviado para o cliente.
-         * @param {Number} statusCode - (opcional) status de retorno do request htttp.
-         * @param {Object} headers - (opcional) configurações a serem definidas no header http.
-         */
-        write: function (content) {
-            this.out.push(content)
+    /**
+     * Escreve em formato *texto* o conteúdo passado no parâmetro *content* como resposta
+     * a requisição. Modifica o valor do *content-type* para *'text/html'*.
+     * @param {Object} data - dado a ser enviado para o cliente.
+     * @param {Number} statusCode - (opcional) status de retorno do request htttp.
+     * @param {Object} headers - (opcional) configurações a serem definidas no header http.
+     */
+    write: function (content) {
+      this.out.push(content)
 
-            return this
-        },
+      return this
+    },
 
-        setOut: function (content) {
-            this.out = [content]
+    setOut: function (content) {
+      this.out = [content]
 
-            return this
-        },
+      return this
+    },
 
-        toBytes: function () {
-            return new java.lang.String(this.out).getBytes()
-        },
+    toBytes: function () {
+      return new java.lang.String(this.out).getBytes()
+    },
 
-        toJson: function () {
-            return (typeof (this.out[0]) == "object") ? JSON.stringify(this.out[0]) : this.out.join("")
-        },
+    toJson: function () {
+      return (typeof (this.out[0]) == "object") ? JSON.stringify(this.out[0]) : this.out.join("")
+    },
 
-        toString: function () {
-            return this.out.join("")
-        },
+    toString: function () {
+      return this.out.join("")
+    },
 
-        addHeader: function (name, value) {
-            this.headers[name] = value
-        },
+    addHeader: function (name, value) {
+      this.headers[name] = value
+    },
 
-        /**
-         * Escreve em formato *JSON* o objeto passado no parâmetro *data* como resposta
-         * a requisição. Modifica o valor do *content-type* para *'application/json'*.
-         * @param {Object} data - dado a ser enviado para o cliente.
-         * @param {Number} statusCode - (opcional) status de retorno do request htttp.
-         * @param {Object} headers - (opcional) configurações a serem definidas no header http.
-         */
-        json: function (data, statusCode, headers) {
-            var ths = this
+    /**
+     * Escreve em formato *JSON* o objeto passado no parâmetro *data* como resposta
+     * a requisição. Modifica o valor do *content-type* para *'application/json'*.
+     * @param {Object} data - dado a ser enviado para o cliente.
+     * @param {Number} statusCode - (opcional) status de retorno do request htttp.
+     * @param {Object} headers - (opcional) configurações a serem definidas no header http.
+     */
+    json: function (data, statusCode, headers) {
+      var ths = this
 
-            this.contentType = "application/json"
-            this.status = statusCode || 200
+      this.contentType = "application/json"
+      this.status = statusCode || 200
 
-            for (var opt in (headers || {})) {
-                ths.headers[opt] = headers[opt]
-            }
+      for (var opt in (headers || {})) {
+        ths.headers[opt] = headers[opt]
+      }
 
-            this.out[0] = (typeof (data) == "object") ? JSON.stringify(data) : data
-        },
+      this.out[0] = (typeof (data) == "object") ? JSON.stringify(data) : data
+    },
 
-        /**
-         * Objeto que encapsula os métodos de retornos quando ocorre um erro na requisição http.
-         * @ignore
-         */
-        error: {
-            /**
-             * Escreve em formato *JSON* uma mensagem de erro como resposta a requisição no
-             * formato {message: *message*, status: *statusCode*}. Modifica o valor
-             * do *content-type* para *'application/json'*.
-             * @alias error.json
-             * @memberof! http.Response#
-             * @instance error.json
-             * @param {String} message - mensagem de erro a ser enviada no retorno da chamada do browser.
-             * @param {Number} statusCode - (opcional) status de retorno do request htttp.
-             * @param {Object} headers - (opcional) configurações a serem definidas no header http.
-             */
-            json: function (message, statusCode, headers) {
-                var ths = this
+    /**
+     * Objeto que encapsula os métodos de retornos quando ocorre um erro na requisição http.
+     * @ignore
+     */
+    error: {
+      /**
+       * Escreve em formato *JSON* uma mensagem de erro como resposta a requisição no
+       * formato {message: *message*, status: *statusCode*}. Modifica o valor
+       * do *content-type* para *'application/json'*.
+       * @alias error.json
+       * @memberof! http.Response#
+       * @instance error.json
+       * @param {String} message - mensagem de erro a ser enviada no retorno da chamada do browser.
+       * @param {Number} statusCode - (opcional) status de retorno do request htttp.
+       * @param {Object} headers - (opcional) configurações a serem definidas no header http.
+       */
+      json: function (message, statusCode, headers) {
+        var ths = this
 
-                this.contentType = "application/json"
-                this.status = statusCode || 200
+        this.contentType = "application/json"
+        this.status = statusCode || 200
 
-                for (var opt in (headers || {})) {
-                    ths.headers[opt] = headers[opt]
-                }
-
-                this.out[0] = JSON.stringify({
-                    status: ths.status,
-                    message: message
-                })
-            }
+        for (var opt in (headers || {})) {
+          ths.headers[opt] = headers[opt]
         }
-    }
 
-    return response
+        this.out[0] = JSON.stringify({
+          status: ths.status,
+          message: message
+        })
+      }
+    }
+  }
+
+  return response
 }
 
 
 exports = {
-    createServer: createServer
+  createServer: createServer
 }
