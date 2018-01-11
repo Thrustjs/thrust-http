@@ -1,5 +1,5 @@
-var server = require("http")
-var router = require("./httpRouter")
+var server = require("thrust-bitcodes/http")
+var router = require("thrust-bitcodes/router")
 
 print("Hello Server!!")
 

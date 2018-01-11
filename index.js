@@ -10,8 +10,6 @@ var URL = Java.type("java.net.URL")
 var URLConnection = Java.type("java.net.URLConnection")
 var URLDecoder = Java.type("java.net.URLDecoder")
 
-loadJar("./jarlib/tomcat-embed-core-9.0.2.jar")
-
 var Tomcat = Java.type("org.apache.catalina.startup.Tomcat")
 var WebResourceRoot = Java.type("org.apache.catalina.WebResourceRoot")
 var StandardContext = Java.type("org.apache.catalina.core.StandardContext")

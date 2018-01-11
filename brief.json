@@ -1,10 +1,13 @@
 {
   "description": "HTTP server module",
   "name": "http",
-  "path": "dist",
+  "path": "index.js",
   "version": "0.1.2",
   "author": "Nery Jr",
   "dependencies": [
     "thrust-bitcodes/router"
+  ],
+  "jarDependencies": [
+    "org.apache.tomcat.embed:tomcat-embed-core:9.0.2"
   ]
 }
