@@ -33,7 +33,7 @@ var router
 
 function createServer(port, httpRouter) {
   var tomcat = new Tomcat()
-  var ctx = tomcat.addContext("/", new File(".").getAbsolutePath())
+  var ctx = tomcat.addContext("/", new File(rootPath).getAbsolutePath())
 
   router = (httpRouter) ? httpRouter : require("thrust-bitcodes/router")
 
