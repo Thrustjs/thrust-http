@@ -4,10 +4,12 @@
   "path": "index.js",
   "version": "0.1.2",
   "author": "Nery Jr",
-  "dependencies": [
-    "thrust-bitcodes/router"
-  ],
-  "jarDependencies": [
-    "org.apache.tomcat.embed:tomcat-embed-core:9.0.2"
-  ]
+  "dependencies": {
+    "bitcodes": [
+      "thrust-bitcodes/router"
+    ],
+    "jars": [
+      "org.apache.tomcat.embed:tomcat-embed-core:9.0.2"
+    ]
+  }
 }
