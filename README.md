@@ -1,24 +1,31 @@
-# thrust-http
-Modulo http do thrust que inclui servidor http e http client
+Http
+===============
 
-## Example HTTP Server
+Http é um *bitcode* de servidor http, usado para responder requisições e servir arquivos estáticos em [ThrustJS](https://github.com/thrustjs/thrust)
 
-Crie um arquivo, por exemplo *server.js*, e copie o código abaixo:
+## Tutorial
+
 ```javascript
-var server = require("http")
-var router = require("router")
-
-print("Hello Server!!")
-
-server.createServer(3000, router)
+var server = require("thrust-bitcodes/http")
+server.createServer(8778)
 ```
+O servidor HTTP irá subir na porta 8778.
+Acesse a URL http://localhost:8778/ a partir de um browser e será renderizado o seguinte conteúdo:
 
-Vá na console e execute o thrust:
-```shell
-java -jar thrust.jar server.js
-```
-O servidor HTTP irá subir na porta 3000.
-Chame a URL http://localhost:3000/ a partir de um browser e será renderizado o seguinte conteúdo:
 ```html
 Thrust is running!!!
 ```
+
+O modulo http contém os seguintes métodos
+
+```javascript
+/**
+  * Função que inicia um servidor na porta informada e com o roteamento informados.
+  Caso o router não seja passado, o server criará um default internamente.
+  * @param {Number} port - porta em que o servidor será levantado
+  * @param {thrust-bitcodes/router} [httpRouter=undefined] -router customizado com rotas de serviço
+  */
+createServer(port, httpRouter)
+```
+
+Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/router](https://github.com/thrust-bitcodes/router)

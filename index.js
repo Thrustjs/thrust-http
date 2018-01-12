@@ -31,6 +31,12 @@ var LifecycleException = Java.type("org.apache.catalina.LifecycleException")
  */
 var router
 
+/**
+  * Função que inicia um servidor na porta informada e com o roteamento informados.
+    Caso o router não seja passado, o server criará um default internamente.
+  * @param {Number} port - porta em que o servidor será levantado
+  * @param {thrust-bitcodes/router} [httpRouter=undefined] -router customizado com rotas de serviço
+  */
 function createServer(port, httpRouter) {
   var tomcat = new Tomcat()
   var ctx = tomcat.addContext("/", new File(rootPath).getAbsolutePath())
