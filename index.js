@@ -193,6 +193,8 @@ function mountRequest(httpRequest) {
 
     port: httpRequest.getServerPort(),
 
+    cookies: httpRequest.getCookies(),
+
     headers: headers,
 
     contextPath: httpRequest.getContextPath(),
