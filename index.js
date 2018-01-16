@@ -309,16 +309,16 @@ function mountResponse(httpResponse) {
        * @param {Object} headers - (opcional) configurações a serem definidas no header http.
        */
       json: function (message, statusCode, headers) {
-        var ths = this
+        var ths = response
 
-        this.contentType = "application/json"
-        this.status = statusCode || 200
+        ths.contentType = "application/json"
+        ths.status = statusCode || 200
 
         for (var opt in (headers || {})) {
           ths.headers[opt] = headers[opt]
         }
 
-        this.out[0] = JSON.stringify({
+        ths.out[0] = JSON.stringify({
           status: ths.status,
           message: message
         })
