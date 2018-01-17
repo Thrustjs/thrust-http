@@ -22,7 +22,6 @@ var HttpServletRequest = Java.type("javax.servlet.http.HttpServletRequest")
 var HttpServletResponse = Java.type("javax.servlet.http.HttpServletResponse")
 var Context = Java.type("org.apache.catalina.Context")
 var LifecycleException = Java.type("org.apache.catalina.LifecycleException")
-// var Class = Java.type("")
 
 /**
  * Gerenciador de rotas. Processa as requisições HTTP e segundo definições
