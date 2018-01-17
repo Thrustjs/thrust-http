@@ -16,7 +16,8 @@ Acesse a URL http://localhost:8778/ a partir de um browser e será renderizado o
 ```html
 Thrust is running!!!
 ```
-O modulo http contém os seguintes métodos
+
+## API
 
 ```javascript
 /**
