@@ -29,4 +29,17 @@ Thrust is running!!!
 createServer(port, httpRouter)
 ```
 
+## Parâmetros de configuração
+As propriedades abaixo devem ser configuradas no arquivo *config.json* (distribuído juntamente com o ThrustJS):
+
+``` javascript
+{
+  ...
+  "http": { /*Configuração do http*/
+    "staticFilesPath": /*String (Default: static)*/,
+  }
+}
+
+```
+
 Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/router](https://github.com/thrust-bitcodes/router)

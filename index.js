@@ -37,6 +37,8 @@ var router
   * @param {thrust-bitcodes/router} [httpRouter=undefined] -router customizado com rotas de serviço
   */
 function createServer(port, httpRouter) {
+  var config = getBitcodeConfig('http')
+
   var tomcat = new Tomcat()
   var ctx = tomcat.addContext("/", new File(rootPath).getAbsolutePath())
 
@@ -49,8 +51,26 @@ function createServer(port, httpRouter) {
   })
   ctx.addServletMappingDecoded("/*", "thrust")
 
+  let staticFilesPath = config('staticFilesPath')
+
+  if (staticFilesPath) {
+    if (!staticFilesPath.startsWith('/')) {
+      staticFilesPath = '/'.concat(staticFilesPath)
+    }
+
+    if (!staticFilesPath.endsWith('/*')) {
+      if (staticFilesPath.endsWith('/')) {
+        staticFilesPath = staticFilesPath.concat('*')
+      } else {
+        staticFilesPath = staticFilesPath.concat('/*')
+      }
+    }
+  } else {
+    staticFilesPath = '/static/*'
+  }
+
   Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
-  ctx.addServletMappingDecoded("/static/*", "static");
+  ctx.addServletMappingDecoded(staticFilesPath, "static");
 
   Tomcat.addServlet(ctx, "favicon", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
   ctx.addServletMappingDecoded("/favicon.ico", "favicon");
@@ -61,7 +81,6 @@ function createServer(port, httpRouter) {
   print("Running on port " + port + "...")
   tomcat.getServer().await()
 }
-
 
 function service(httpRequest, httpResponse) {
   var request = mountRequest(httpRequest)
