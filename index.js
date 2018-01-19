@@ -100,10 +100,18 @@ function service(httpRequest, httpResponse) {
 }
 
 
-function parseParams(strParams, contentType) {
+function parseParams(strParams, contentType){
   var params = {}
 
   function parseValue(value) {
+    if (value === 'true') {
+      return true
+    }
+
+    if (value === 'false') {
+      return false
+    }
+
     var nv = parseFloat(value)
 
     return isNaN(nv) ? value : nv
