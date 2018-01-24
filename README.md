@@ -6,7 +6,8 @@ Http é um *bitcode* de servidor http, usado para responder requisições e serv
 ## Tutorial
 
 ```javascript
-var server = require("thrust-bitcodes/http")
+let server = require("http")
+
 server.createServer(8778)
 ```
 O servidor HTTP irá subir na porta 8778.
@@ -16,7 +17,7 @@ Acesse a URL http://localhost:8778/ a partir de um browser e será renderizado o
 Thrust is running!!!
 ```
 
-O modulo http contém os seguintes métodos
+## API
 
 ```javascript
 /**
@@ -26,6 +27,19 @@ O modulo http contém os seguintes métodos
   * @param {thrust-bitcodes/router} [httpRouter=undefined] -router customizado com rotas de serviço
   */
 createServer(port, httpRouter)
+```
+
+## Parâmetros de configuração
+As propriedades abaixo devem ser configuradas no arquivo *config.json* (distribuído juntamente com o ThrustJS):
+
+``` javascript
+{
+  ...
+  "http": { /*Configuração do http*/
+    "staticFilesPath": /*String (Default: static)*/,
+  }
+}
+
 ```
 
 Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/router](https://github.com/thrust-bitcodes/router)
