@@ -68,7 +68,6 @@ function service(httpRequest, httpResponse) {
   var request = mountRequest(httpRequest)
   var response = mountResponse(httpResponse)
   var params = parseParams(request.queryString, request.contentType)
-  var writer = httpResponse.getWriter()
 
   router.process(params, request, response)
 
