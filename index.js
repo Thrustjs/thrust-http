@@ -44,33 +44,48 @@ function createServer(port, httpRouter) {
 
   router = (httpRouter) ? httpRouter : require("thrust-bitcodes/router")
 
+  let staticFilesPath = config('staticFilesPath') || 'static'
+  let staticServletMapping = staticFilesPath;
+
+  if (!staticServletMapping.startsWith('/')) {
+    staticServletMapping = '/'.concat(staticServletMapping)
+  }
+
+  if (!staticServletMapping.endsWith('/*')) {
+    if (staticServletMapping.endsWith('/')) {
+      staticServletMapping = staticServletMapping.concat('*')
+    } else {
+      staticServletMapping = staticServletMapping.concat('/*')
+    }
+  }
+
+  const staticIndexFile = new File(staticFilesPath, 'index.html')
+  const existsStaticIndex = staticIndexFile.exists()
+
   Tomcat.addServlet(ctx, "thrust", new HttpServlet() {
     service: function (request, response) {
-      service(request, response)
+
+
+      if (existsStaticIndex && ('' == request.getRequestURI() || '/' == request.getRequestURI())) {
+        response.setStatus(200)
+        response.setContentType('text/html')
+
+        let indexBytes = java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(staticIndexFile.getPath()))
+
+        response.setContentLength(indexBytes.length)
+
+        var ops = response.getOutputStream()
+        ops.write(indexBytes)
+        ops.flush()
+      } else {
+        service(request, response)
+      }
     }
   })
   ctx.addServletMappingDecoded("/*", "thrust")
 
-  let staticFilesPath = config('staticFilesPath')
-
-  if (staticFilesPath) {
-    if (!staticFilesPath.startsWith('/')) {
-      staticFilesPath = '/'.concat(staticFilesPath)
-    }
-
-    if (!staticFilesPath.endsWith('/*')) {
-      if (staticFilesPath.endsWith('/')) {
-        staticFilesPath = staticFilesPath.concat('*')
-      } else {
-        staticFilesPath = staticFilesPath.concat('/*')
-      }
-    }
-  } else {
-    staticFilesPath = '/static/*'
-  }
-
   Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
-  ctx.addServletMappingDecoded(staticFilesPath, "static");
+  ctx.addServletMappingDecoded(staticServletMapping, "static");
 
   Tomcat.addServlet(ctx, "favicon", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
   ctx.addServletMappingDecoded("/favicon.ico", "favicon");
