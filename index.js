@@ -53,7 +53,7 @@ function createServer(port, httpRouter) {
   ctx.setAllowCasualMultipartParsing(true)
   ctx.addServletMappingDecoded("/*", "thrust")
 
-  let staticFilesPath = config('staticFilesPath')
+  var staticFilesPath = config('staticFilesPath')
 
   if (staticFilesPath) {
     if (!staticFilesPath.startsWith('/')) {
