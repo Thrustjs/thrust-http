@@ -4,3 +4,5 @@ tomcat.*
 .eslintrc.json
 jsconfig.json
 teste.js
+test/.lib
+test/tomcat.8080

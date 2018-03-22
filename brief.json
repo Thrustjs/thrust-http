@@ -2,8 +2,12 @@
   "description": "HTTP server module",
   "name": "http",
   "path": "index.js",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "author": "Nery Jr",
+  "contributors": [
+    "Cleverson Puche",
+    "Bruno Machado"
+  ],
   "dependencies": {
     "bitcodes": [
       "thrust-bitcodes/router"

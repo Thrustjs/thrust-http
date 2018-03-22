@@ -1,0 +1,10 @@
+{
+  "name": "test-http",
+  "version": "1.0",
+  "dependencies": [
+    "thrust-bitcodes/http",
+    "thrust-bitcodes/filesystem",
+    "majesty",
+    "http-client"
+  ]
+}

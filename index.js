@@ -36,8 +36,10 @@ var router
   * @param {Number} port - porta em que o servidor será levantado
   * @param {thrust-bitcodes/router} [httpRouter=undefined] -router customizado com rotas de serviço
   */
-function createServer(port, httpRouter) {
+function createServer(port, httpRouter, options) {
+  var opts = options || {}
   var config = getBitcodeConfig('http')
+  var staticFilesPath = opts.staticFilesPath || config('staticFilesPath') || '/static'
 
   var tomcat = new Tomcat()
   var ctx = tomcat.addContext("/", new File(rootPath).getAbsolutePath())
@@ -45,7 +47,7 @@ function createServer(port, httpRouter) {
   router = (httpRouter) ? httpRouter : require("thrust-bitcodes/router")
 
   Tomcat.addServlet(ctx, "thrust", new HttpServlet() {
-    service: function (request, response) {
+    service: function(request, response) {
       service(request, response)
     }
   })
@@ -53,23 +55,7 @@ function createServer(port, httpRouter) {
   ctx.setAllowCasualMultipartParsing(true)
   ctx.addServletMappingDecoded("/*", "thrust")
 
-  var staticFilesPath = config('staticFilesPath')
-
-  if (staticFilesPath) {
-    if (!staticFilesPath.startsWith('/')) {
-      staticFilesPath = '/'.concat(staticFilesPath)
-    }
-
-    if (!staticFilesPath.endsWith('/*')) {
-      if (staticFilesPath.endsWith('/')) {
-        staticFilesPath = staticFilesPath.concat('*')
-      } else {
-        staticFilesPath = staticFilesPath.concat('/*')
-      }
-    }
-  } else {
-    staticFilesPath = '/static/*'
-  }
+  staticFilesPath = '/' + staticFilesPath.replace(/^\/|\/\*$|\//g, '') + '/*'
 
   Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
   ctx.addServletMappingDecoded(staticFilesPath, "static");
@@ -90,18 +76,10 @@ function service(httpRequest, httpResponse) {
   var params = parseParams(request.queryString, request.contentType)
 
   router.process(params, request, response)
-
-  /*     httpResponse.setContentType("text/plain")
-      writer.write("Hello, Embedded World from Blue Lotus Software!")
-      httpResponse.setContentType("application/json")
-      httpResponse.setCharacterEncoding("UTF-8")
-      writer.write('{nome: "P Paulo", idade: 13}')
-      writer.flush()
-      writer.close() */
 }
 
 
-function parseParams(strParams, contentType){
+function parseParams(strParams, contentType) {
   var params = {}
 
   function parseValue(value) {
@@ -113,9 +91,7 @@ function parseParams(strParams, contentType){
       return false
     }
 
-    var nv = parseFloat(value)
-
-    return isNaN(nv) ? value : nv
+    return isNaN(value) ? value : Number(value)
   }
 
   function parseKey(skey, value) {
@@ -163,7 +139,7 @@ function parseParams(strParams, contentType){
 
 
 function mountRequest(httpRequest) {
-  var queryString = (function () {
+  var queryString = (function() {
     var contentType = httpRequest.getContentType() || ""
     var qs = ""
 
@@ -176,7 +152,7 @@ function mountRequest(httpRequest) {
     return qs
   })()
 
-  var headers = (function () {
+  var headers = (function() {
     var headerNames = httpRequest.getHeaderNames()
     var headersNameValue = {}
 
@@ -196,7 +172,7 @@ function mountRequest(httpRequest) {
    * request body. The part may represent either an uploaded file or form data."*
    * @return {type} {description}
    */
-  var parts = (function () {
+  var parts = (function() {
     var contentType = httpRequest.getContentType() || ""
 
     if (contentType.indexOf("multipart/form-data") == -1)
@@ -256,7 +232,7 @@ function mountResponse(httpResponse) {
 
     out: [],
 
-    clean: function () {
+    clean: function() {
       this.out = []
       this.headers = {}
       this.contentLength = 0
@@ -271,31 +247,31 @@ function mountResponse(httpResponse) {
      * @param {Number} statusCode - (opcional) status de retorno do request htttp.
      * @param {Object} headers - (opcional) configurações a serem definidas no header http.
      */
-    write: function (content) {
+    write: function(content) {
       this.out.push(content)
 
       return this
     },
 
-    setOut: function (content) {
+    setOut: function(content) {
       this.out = [content]
 
       return this
     },
 
-    toBytes: function () {
+    toBytes: function() {
       return new java.lang.String(this.out).getBytes()
     },
 
-    toJson: function () {
+    toJson: function() {
       return (typeof (this.out[0]) == "object") ? JSON.stringify(this.out[0]) : this.out.join("")
     },
 
-    toString: function () {
+    toString: function() {
       return this.out.join("")
     },
 
-    addHeader: function (name, value) {
+    addHeader: function(name, value) {
       this.headers[name] = value
     },
 
@@ -306,7 +282,7 @@ function mountResponse(httpResponse) {
      * @param {Number} statusCode - (opcional) status de retorno do request htttp.
      * @param {Object} headers - (opcional) configurações a serem definidas no header http.
      */
-    json: function (data, statusCode, headers) {
+    json: function(data, statusCode, headers) {
       var ths = this
 
       this.contentType = "application/json"
@@ -335,7 +311,7 @@ function mountResponse(httpResponse) {
        * @param {Number} statusCode - (opcional) status de retorno do request htttp.
        * @param {Object} headers - (opcional) configurações a serem definidas no header http.
        */
-      json: function (message, statusCode, headers) {
+      json: function(message, statusCode, headers) {
         var ths = response
 
         ths.contentType = "application/json"
@@ -355,7 +331,6 @@ function mountResponse(httpResponse) {
 
   return response
 }
-
 
 exports = {
   createServer: createServer
