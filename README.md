@@ -47,6 +47,9 @@ Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/r
 
 ## What's new
 
+v0.2.0 - Fix: corrigindo a _decodificação_ quando um JSON é passado no _body_ do POST ou PUT
+* Foi corrigido o método [mountRequest] para não decodificar o conteúdo do body quando o mesmo for um JSON
+
 v0.1.9 - Fix/Melhoria: _createServer_ adicionando o parâmetro _options_ e correção do _parseParams_
 * adicionando o parâmetro _options_ no método _createServer_ possibilitando especificar o path para arquivos estáticos através do atributo _staticFilesPath_ e outras opções no futuro.
 * corrigindo o método _parseParams_ que retornava um numérico quando uma string começava com números.

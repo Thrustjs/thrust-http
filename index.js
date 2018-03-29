@@ -140,13 +140,20 @@ function parseParams(strParams, contentType) {
 
 function mountRequest(httpRequest) {
   var queryString = (function() {
-    var contentType = httpRequest.getContentType() || ""
-    var qs = ""
+    var contentType = httpRequest.getContentType() || ''
+    var body = ''
+    var qs = ''
 
-    if (contentType.indexOf("multipart/form-data") == -1) {
-      qs = httpRequest.getReader().readLine()
-      qs = (qs === null || qs === "") ? httpRequest.getQueryString() : qs
-      qs = (qs === null) ? "" : URLDecoder.decode(qs, "UTF-8")
+    if (contentType.indexOf('multipart/form-data') == -1) {
+      body = httpRequest.getReader().readLine()
+
+      if (body && body !== '') {
+
+        return contentType.startsWith('application/json') ? body : URLDecoder.decode(body, 'UTF-8')
+      }
+
+      qs = httpRequest.getQueryString()
+      qs = (qs === null) ? '' : URLDecoder.decode(qs, 'UTF-8')
     }
 
     return qs
