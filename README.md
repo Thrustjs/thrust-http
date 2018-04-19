@@ -8,7 +8,10 @@ Http é um *bitcode* de servidor http, usado para responder requisições e serv
 ```javascript
 let server = require("http")
 
-server.createServer(8778)
+server.createServer(8778, null /*router*/, {
+  "staticFilesPath": /*String (Default: /static)*/,
+  "maxPostSize": /*Inteiro (Default: 2MB)*/,
+})
 ```
 O servidor HTTP irá subir na porta 8778.
 Acesse a URL http://localhost:8778/ a partir de um browser e será renderizado o seguinte conteúdo:
@@ -37,6 +40,7 @@ As propriedades abaixo devem ser configuradas no arquivo *config.json* (distribu
   ...
   "http": { /*Configuração do http*/
     "staticFilesPath": /*String (Default: static)*/,
+    "maxPostSize": /*Inteiro (Default: 2MB)*/,
   }
 }
 
@@ -46,6 +50,9 @@ Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/r
 
 
 ## What's new
+
+v0.2.1 - Melhoria: Adicionando opção maxPostSize para o servidor
+* Por padrão o servidor tem um limite de tamanho do post de 2MB, foi criada a opção maxPostSize para que seja possível alterar este valor padrão
 
 v0.2.0 - Fix: corrigindo a _decodificação_ quando um JSON é passado no _body_ do POST ou PUT
 * Foi corrigido o método [mountRequest] para não decodificar o conteúdo do body quando o mesmo for um JSON

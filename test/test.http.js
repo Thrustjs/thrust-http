@@ -21,7 +21,7 @@ function exec(describe, it, beforeEach, afterEach, expect, should, assert) {
 
     describe('Acessando APIs com método [GET]', function() {
       it('Retornando um objeto JSON', function() {
-        rs = httpClient.get('http://localhost:8778/app/teste/echo')
+        rs = httpClient.post('http://localhost:8778/app/teste/echo')
           .params({ nome: 'thrust', nota: 10 })
           .charset('UTF-8')
           .fetch()
@@ -29,7 +29,6 @@ function exec(describe, it, beforeEach, afterEach, expect, should, assert) {
         expect(rs.code).to.equal(200)
         expect(rs.body.nome).to.equal('thrust')
         expect(rs.body.nota).to.equal(10)
-        expect(rs.body.server).to.equal(true)
         expect(rs.headers['Content-Type']).contains('application/json')
       })
     })
@@ -39,8 +38,6 @@ function exec(describe, it, beforeEach, afterEach, expect, should, assert) {
         rs = httpClient.get('http://localhost:8778/app/teste/params?id=557897')
           // .charset('UTF-8')
           .fetch()
-
-        console.log('rs =>', rs)
 
         expect(rs.code).to.equal(200)
         expect(rs.body.id).to.a('number')

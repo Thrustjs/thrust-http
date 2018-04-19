@@ -64,7 +64,15 @@ function createServer(port, httpRouter, options) {
   ctx.addServletMappingDecoded("/favicon.ico", "favicon");
 
   tomcat.setPort(port)
-  tomcat.getConnector();
+  
+  var connector = tomcat.getConnector();
+  
+  var maxPostSize = opts.maxPostSize || config('maxPostSize');
+  
+  if (maxPostSize) {
+    connector.setMaxPostSize(maxPostSize);
+  }
+
   tomcat.start()
   print("Running on port " + port + "...")
   tomcat.getServer().await()

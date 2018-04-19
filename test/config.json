@@ -1,6 +1,7 @@
 {
   "transpileScripts": false,
   "loadToGlobal": [],
+  "maxPostSize": 99999999,
   "database": {
     "driverClassName": "",
     "urlConnection": "",
