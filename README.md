@@ -11,6 +11,9 @@ let server = require("http")
 server.createServer(8778, null /*router*/, {
   "staticFilesPath": /*String (Default: /static)*/,
   "maxPostSize": /*Inteiro (Default: 2MB)*/,
+  "compression": /*Boolean (Default: true)*/,
+  "compressionMinSize": /*Inteiro em bytes (Default: 1024)*/,
+  "compressableMimeType": /*Inteiro (Default: "text/html,text/xml,text/css,application/json,application/javascript")*/,
 })
 ```
 O servidor HTTP irá subir na porta 8778.
@@ -41,6 +44,9 @@ As propriedades abaixo devem ser configuradas no arquivo *config.json* (distribu
   "http": { /*Configuração do http*/
     "staticFilesPath": /*String (Default: static)*/,
     "maxPostSize": /*Inteiro (Default: 2MB)*/,
+    "compression": /*Boolean (Default: true)*/,
+    "compressionMinSize": /*Inteiro em bytes (Default: 1024)*/,
+    "compressableMimeType": /*Inteiro (Default: "text/html,text/xml,text/css,application/json,application/javascript")*/,
   }
 }
 
@@ -50,6 +56,9 @@ Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/r
 
 
 ## What's new
+
+v0.2.2 - Melhoria: Adicionando opções referentes a compressão GZIP das requisições:
+* Agora, por padrão o http irá realizar a compressão GZIP dos dados retornados, também é possível alterar os padrões, via options ou config.json, vide parâmetros acima. 
 
 v0.2.1 - Melhoria: Adicionando opção maxPostSize para o servidor
 * Por padrão o servidor tem um limite de tamanho do post de 2MB, foi criada a opção maxPostSize para que seja possível alterar este valor padrão

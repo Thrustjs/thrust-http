@@ -2,7 +2,7 @@
   "description": "HTTP server module",
   "name": "http",
   "path": "index.js",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Nery Jr",
   "contributors": [
     "Cleverson Puche",

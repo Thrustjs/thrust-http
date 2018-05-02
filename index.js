@@ -35,11 +35,19 @@ var router
     Caso o router não seja passado, o server criará um default internamente.
   * @param {Number} port - porta em que o servidor será levantado
   * @param {thrust-bitcodes/router} [httpRouter=undefined] -router customizado com rotas de serviço
+  * @param {Object} options - Objeto que pode ser passado sobreescrevendo configurações padrão do http
   */
 function createServer(port, httpRouter, options) {
-  var opts = options || {}
-  var config = getBitcodeConfig('http')
-  var staticFilesPath = opts.staticFilesPath || config('staticFilesPath') || '/static'
+  var config = getBitcodeConfig('http');
+
+  var compression = config('compression');
+
+  var opts = Object.assign({
+    staticFilesPath: config('staticFilesPath') || '/static',
+    compression: typeof compression != undefined  ? config('compression') : true,
+    compressionMinSize: config('compressionMinSize') || 1024,
+    compressableMimeType: config('compressableMimeType') || "text/html,text/xml,text/css,application/json,application/javascript"
+  }, options);
 
   var tomcat = new Tomcat()
   var ctx = tomcat.addContext("/", new File(rootPath).getAbsolutePath())
@@ -55,7 +63,7 @@ function createServer(port, httpRouter, options) {
   ctx.setAllowCasualMultipartParsing(true)
   ctx.addServletMappingDecoded("/*", "thrust")
 
-  staticFilesPath = '/' + staticFilesPath.replace(/^\/|\/\*$|\//g, '') + '/*'
+  var staticFilesPath = '/' + opts.staticFilesPath.replace(/^\/|\/\*$|\//g, '') + '/*'
 
   Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
   ctx.addServletMappingDecoded(staticFilesPath, "static");
@@ -67,11 +75,13 @@ function createServer(port, httpRouter, options) {
   
   var connector = tomcat.getConnector();
   
-  var maxPostSize = opts.maxPostSize || config('maxPostSize');
-  
-  if (maxPostSize) {
-    connector.setMaxPostSize(maxPostSize);
+  if (opts.maxPostSize) {
+    connector.setMaxPostSize(opts.maxPostSize);
   }
+
+  connector.setProperty("compression", opts.compression ? "on" : "off");
+  connector.setProperty("compressionMinSize", String(opts.compressionMinSize));
+  connector.setProperty("compressableMimeType", opts.compressableMimeType);
 
   tomcat.start()
   print("Running on port " + port + "...")
