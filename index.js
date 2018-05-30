@@ -211,7 +211,7 @@ function mountRequest(httpRequest) {
 
     queryString: queryString,
 
-    rest: httpRequest.getRequestURI().replace(this.contextPath, ""),
+    rest: httpRequest.getRequestURI().replace(httpRequest.getContextPath(), ""),
 
     contentType: httpRequest.getContentType() || "",
 
