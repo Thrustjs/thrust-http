@@ -14,6 +14,13 @@ server.createServer(8778, null /*router*/, {
   "compression": /*Boolean (Default: true)*/,
   "compressionMinSize": /*Inteiro em bytes (Default: 1024)*/,
   "compressableMimeType": /*Inteiro (Default: "text/html,text/xml,text/css,application/json,application/javascript")*/,
+  "servlets": {
+    httpProxy: { /*String nome único do servlet (Default: false)*/,
+      plainJava: /*Boolean define se o servlet recebera o request/response como java (Default: false)*/,
+      service: /*Function implementação do servlet*/,
+      paths: /*Array<String> paths em que o servlet responderá*/
+    }
+  }
 })
 ```
 O servidor HTTP irá subir na porta 8778.
@@ -56,6 +63,8 @@ Para mais informações sobre o módulo de roteamento, acesse [thrust-bitcodes/r
 
 
 ## What's new
+
+v0.3.0 - Melhoria: Adicionando possibilidade de adicionar servlets customizados ao thrust 
 
 v0.2.2 - Melhoria: Adicionando opções referentes a compressão GZIP das requisições:
 * Agora, por padrão o http irá realizar a compressão GZIP dos dados retornados, também é possível alterar os padrões, via options ou config.json, vide parâmetros acima. 

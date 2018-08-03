@@ -44,27 +44,40 @@ function createServer(port, httpRouter, options) {
 
   var opts = Object.assign({
     staticFilesPath: config('staticFilesPath') || '/static',
-    compression: typeof compression != undefined  ? config('compression') : true,
+    compression: typeof compression != undefined ? config('compression') : true,
     compressionMinSize: config('compressionMinSize') || 1024,
-    compressableMimeType: config('compressableMimeType') || "text/html,text/xml,text/css,application/json,application/javascript"
+    compressableMimeType: config('compressableMimeType') || "text/html,text/xml,text/css,application/json,application/javascript",
+    apiPath: config('apiPath') || '/*',
+    servlets: {}
   }, options);
 
   var tomcat = new Tomcat()
-  var ctx = tomcat.addContext("/", new File(rootPath).getAbsolutePath())
+
+  var ctx = tomcat.addContext("", new File(rootPath).getAbsolutePath())
+  ctx.setAllowCasualMultipartParsing(true)
 
   router = (httpRouter) ? httpRouter : require("thrust-bitcodes/router")
 
   Tomcat.addServlet(ctx, "thrust", new HttpServlet() {
-    service: function(request, response) {
+    service: function (request, response) {
       service(request, response)
     }
   })
+  ctx.addServletMappingDecoded(opts.apiPath, "thrust")
 
-  ctx.setAllowCasualMultipartParsing(true)
-  ctx.addServletMappingDecoded("/*", "thrust")
+  Object.keys(opts.servlets).forEach(function (servletName) {
+    let servletInfo = opts.servlets[servletName];
+
+    Tomcat.addServlet(ctx, servletInfo.name, new HttpServlet() {
+      service: servletInfo.service 
+    });
+
+    servletInfo.paths.forEach(function (path) {
+      ctx.addServletMappingDecoded(path, servletInfo.name)
+    });
+  });
 
   var staticFilesPath = '/' + opts.staticFilesPath.replace(/^\/|\/\*$|\//g, '') + '/*'
-
   Tomcat.addServlet(ctx, "static", org.apache.catalina.servlets.DefaultServlet.class.getCanonicalName());
   ctx.addServletMappingDecoded(staticFilesPath, "static");
 
@@ -72,9 +85,9 @@ function createServer(port, httpRouter, options) {
   ctx.addServletMappingDecoded("/favicon.ico", "favicon");
 
   tomcat.setPort(port)
-  
+
   var connector = tomcat.getConnector();
-  
+
   if (opts.maxPostSize) {
     connector.setMaxPostSize(opts.maxPostSize);
   }
@@ -95,7 +108,6 @@ function service(httpRequest, httpResponse) {
 
   router.process(params, request, response)
 }
-
 
 function parseParams(strParams, contentType) {
   var params = {}
@@ -157,7 +169,7 @@ function parseParams(strParams, contentType) {
 
 
 function mountRequest(httpRequest) {
-  var queryString = (function() {
+  var queryString = (function () {
     var contentType = httpRequest.getContentType() || ''
     var body = ''
     var qs = ''
@@ -177,7 +189,7 @@ function mountRequest(httpRequest) {
     return qs
   })()
 
-  var headers = (function() {
+  var headers = (function () {
     var headerNames = httpRequest.getHeaderNames()
     var headersNameValue = {}
 
@@ -197,7 +209,7 @@ function mountRequest(httpRequest) {
    * request body. The part may represent either an uploaded file or form data."*
    * @return {type} {description}
    */
-  var parts = (function() {
+  var parts = (function () {
     var contentType = httpRequest.getContentType() || ""
 
     if (contentType.indexOf("multipart/form-data") == -1)
@@ -257,7 +269,7 @@ function mountResponse(httpResponse) {
 
     out: [],
 
-    clean: function() {
+    clean: function () {
       this.out = []
       this.headers = {}
       this.contentLength = 0
@@ -272,31 +284,31 @@ function mountResponse(httpResponse) {
      * @param {Number} statusCode - (opcional) status de retorno do request htttp.
      * @param {Object} headers - (opcional) configurações a serem definidas no header http.
      */
-    write: function(content) {
+    write: function (content) {
       this.out.push(content)
 
       return this
     },
 
-    setOut: function(content) {
+    setOut: function (content) {
       this.out = [content]
 
       return this
     },
 
-    toBytes: function() {
+    toBytes: function () {
       return new java.lang.String(this.out).getBytes()
     },
 
-    toJson: function() {
+    toJson: function () {
       return (typeof (this.out[0]) == "object") ? JSON.stringify(this.out[0]) : this.out.join("")
     },
 
-    toString: function() {
+    toString: function () {
       return this.out.join("")
     },
 
-    addHeader: function(name, value) {
+    addHeader: function (name, value) {
       this.headers[name] = value
     },
 
@@ -307,7 +319,7 @@ function mountResponse(httpResponse) {
      * @param {Number} statusCode - (opcional) status de retorno do request htttp.
      * @param {Object} headers - (opcional) configurações a serem definidas no header http.
      */
-    json: function(data, statusCode, headers) {
+    json: function (data, statusCode, headers) {
       var ths = this
 
       this.contentType = "application/json"
@@ -336,7 +348,7 @@ function mountResponse(httpResponse) {
        * @param {Number} statusCode - (opcional) status de retorno do request htttp.
        * @param {Object} headers - (opcional) configurações a serem definidas no header http.
        */
-      json: function(message, statusCode, headers) {
+      json: function (message, statusCode, headers) {
         var ths = response
 
         ths.contentType = "application/json"

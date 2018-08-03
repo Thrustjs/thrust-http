@@ -42,6 +42,15 @@ function exec(describe, it, beforeEach, afterEach, expect, should, assert) {
         expect(rs.body.id).to.a('number')
         expect(rs.body.id).to.equal(557897)
       })
+
+      it('Acessando um customServlet', function () {
+        rs = httpClient.get('http://localhost:8778/customServlet')
+          .fetch()
+
+        expect(rs.code).to.equal(200)
+        expect(rs.body).to.a('string')
+        expect(rs.body).to.equal('customServlet')
+      })
     })
 
     describe('Validando propriedades dos objetos da requisição', function () {
