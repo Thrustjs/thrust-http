@@ -68,12 +68,12 @@ function createServer(port, httpRouter, options) {
   Object.keys(opts.servlets).forEach(function (servletName) {
     let servletInfo = opts.servlets[servletName];
 
-    Tomcat.addServlet(ctx, servletInfo.name, new HttpServlet() {
+    Tomcat.addServlet(ctx, servletName, new HttpServlet() {
       service: servletInfo.service 
     });
 
     servletInfo.paths.forEach(function (path) {
-      ctx.addServletMappingDecoded(path, servletInfo.name)
+      ctx.addServletMappingDecoded(path, servletName)
     });
   });
 
