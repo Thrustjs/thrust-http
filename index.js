@@ -174,7 +174,12 @@ function mountRequest(httpRequest) {
     var body = ''
     var qs = ''
 
-    if (contentType.indexOf('multipart/form-data') == -1) {
+    var binaryTypes = ['multipart/form-data', 'application/zip', 'application/octet-stream']
+    var isBinary = binaryTypes.some(function(type) {
+      return contentType.indexOf(type) == -1
+    })
+
+    if (!isBinary) {
       body = httpRequest.getReader().readLine()
 
       if (body && body !== '') {
