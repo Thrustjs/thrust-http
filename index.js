@@ -176,7 +176,7 @@ function mountRequest(httpRequest) {
 
     var binaryTypes = ['multipart/form-data', 'application/zip', 'application/octet-stream']
     var isBinary = binaryTypes.some(function(type) {
-      return contentType.indexOf(type) == -1
+      return contentType.indexOf(type) > -1
     })
 
     if (!isBinary) {
